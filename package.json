@@ -1,0 +1,17 @@
+{
+  "name": "pagelens",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "PageLens — 注入网页的 AI 视觉助手（Chrome/Edge 扩展 + 本机 DeepSeek 桥接）",
+  "scripts": {
+    "bridge": "node bridge/server.mjs",
+    "bridge:token": "node bridge/server.mjs --print-token",
+    "demo": "node test/demo-server.mjs",
+    "test:bridge": "node test/bridge-smoke.mjs",
+    "test:e2e": "node test/e2e.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.64.1"
+  }
+}

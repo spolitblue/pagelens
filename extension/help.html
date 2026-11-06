@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PageLens 帮助</title>
+  <link rel="stylesheet" href="options.css">
+  <style>
+    .help-card { max-width: 820px; margin: 0 auto; }
+    .help-card h3 { margin: 20px 0 8px; font-size: 14px; }
+    .help-card p, .help-card li { color: var(--dim); font-size: 12.5px; line-height: 1.75; }
+    .help-card ol, .help-card ul { padding-left: 20px; margin: 6px 0 12px; }
+    .help-card code { color: #c4d3e5; background: rgba(255,255,255,.06); border: 1px solid var(--line); border-radius: 4px; padding: 1px 4px; font-family: var(--mono); font-size: 11px; }
+    .back { display: inline-flex; margin-bottom: 14px; color: var(--accent); font-size: 12px; text-decoration: none; }
+    .badge { display: inline-block; color: var(--warn); border: 1px solid rgba(251,191,36,.25); background: rgba(251,191,36,.07); border-radius: 5px; padding: 1px 6px; font-size: 10px; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="help-card">
+      <a class="back" href="options.html">← 回到设置</a>
+      <header class="hero">
+        <div class="hero-inner">
+          <div class="brand">
+            <img class="brand-icon" src="icons/icon128.png" alt="" width="54" height="54">
+            <div class="brand-copy">
+              <h1>PageLens 帮助 <span>常见问题</span></h1>
+              <p>为什么有些页面用不了，以及截图去哪了。</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="card" style="margin-top:16px">
+        <h3>为什么浏览器内置页面没有 PageLens 气泡？</h3>
+        <p>Chrome / Edge 不允许任何扩展往这些页面注入脚本或截图：<code>chrome://</code>、<code>edge://</code>、<code>about:</code>、扩展商店（Chrome Web Store / Edge Add-ons）、浏览器的 PDF 阅读器，以及部分受保护的企业页面。</p>
+        <p><span class="badge">正常现象</span> 换成普通网站（http/https）刷新后，右下角就会出现气泡。</p>
+
+        <h3>按了扩展图标却没反应？</h3>
+        <ul>
+          <li>页面可能是在安装扩展之前打开的：刷新页面即可。</li>
+          <li>可能落在上面的受限页面里，看下一节。</li>
+          <li>如果页面上出现了黄色提示条，说明当前标签页不允许扩展注入。</li>
+        </ul>
+
+        <h3>截图包括哪些内容？</h3>
+        <p>默认截取你当前看到的浏览器可视区域（不是整页长截图），并且会先把 PageLens 自己的面板隐藏掉，所以截图里没有对话框。你也可以点剪刀图标，只框选一块区域；框选的坐标会映射到真实截图分辨率，高 DPI 屏幕也没问题。</p>
+
+        <h3>为什么回答里说“看不到图片”？</h3>
+        <p>检查设置里的模型是否为 <code>deepseek-flash</code>。当前 DeepSeek 目录里的 <code>deepseek-v4-pro</code> 只支持文本输入；看图问答必须使用带视觉能力的模型。另外，如果截图区域太小或纯色，模型也可能没有足够信息。</p>
+
+        <h3>桥接连不上怎么办？</h3>
+        <ol>
+          <li>在项目文件夹双击 <code>bridge/start-bridge.bat</code>，确认命令行窗口里出现“监听 http://127.0.0.1:8790”。</li>
+          <li>保持那个窗口开着（关掉窗口桥接就停了）。</li>
+          <li>回到设置，点「自动配对」，再点「测试连接」。</li>
+          <li>如果仍然失败，确认本机 <code>~/.dsh/.credentials.yaml</code> 里有 <code>DEEPSEEK_API_KEY</code>；或者切到「直连 API」填 Key。</li>
+        </ol>
+        <p>桥接只监听 <code>127.0.0.1</code>，并且用随机令牌鉴权。API Key 只存在于桥接进程读取的环境/文件里，不会传进浏览器扩展，也不会被网页拿到。</p>
+
+        <h3>PageLens 会保存我的对话吗？</h3>
+        <p>不会。对话、截图和页面文字只保存在当前标签页的内存里，刷新或关闭页面就会消失。设置（模型、主题、桥接令牌/API Key）保存在浏览器的 <code>chrome.storage.local</code>。只有点击发送时，数据才会发给你配置的 API。</p>
+
+        <h3>快捷键</h3>
+        <p><kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd> 打开/收起面板；<kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> 框选区域。若被其他软件占用，可在 <code>chrome://extensions/shortcuts</code> 里改。</p>
+
+        <h3>数据和隐私</h3>
+        <p>页面文字只取可见区域的 <code>innerText</code>，最多约 6500 字，不读取输入框的值。截图与页面文字会发送到你设置的 DeepSeek API；请避免对含有密码、身份证等敏感信息的页面提问。你随时可以在面板里关掉「附带页面文字」，只发送截图。</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

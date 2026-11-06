@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lumen Analytics · 增长概览</title>
+<meta name="description" content="Lumen Analytics 增长数据看板，展示访问、转化、渠道表现与本周目标。">
+<style>
+  :root {
+    --ink: #11162a;
+    --ink-2: #4a556f;
+    --muted: #7b879f;
+    --line: #e8ebf3;
+    --bg: #f4f6fb;
+    --panel: #ffffff;
+    --indigo: #5148e6;
+    --indigo-soft: #eeedff;
+    --teal: #0f9d8a;
+    --teal-soft: #e7fbf7;
+    --orange: #f2994a;
+    --orange-soft: #fff4e8;
+    --red: #e05252;
+    --red-soft: #fff0f0;
+    --shadow: 0 10px 34px rgba(28, 39, 73, .06);
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    font-size: 13px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .layout { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 224px; flex: 0 0 224px; background: #0f1630; color: #cdd6ee;
+    padding: 24px 16px 18px; display: flex; flex-direction: column; gap: 24px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 0 8px; }
+  .brand-mark {
+    width: 32px; height: 32px; border-radius: 10px;
+    background: linear-gradient(135deg, #6ee7d8, #818cf8 70%);
+    display: grid; place-items: center; color: #08122a; font-weight: 800; font-size: 15px;
+    box-shadow: 0 8px 24px rgba(110, 231, 216, .18);
+  }
+  .brand-name { color: #fff; font-weight: 700; font-size: 14px; letter-spacing: .2px; }
+  .brand-sub { color: #7180a3; font-size: 10px; margin-top: 2px; }
+  .nav-group { display: flex; flex-direction: column; gap: 3px; }
+  .nav-label { color: #627092; font-size: 10px; letter-spacing: .9px; text-transform: uppercase; padding: 0 10px; margin-bottom: 5px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 10px;
+    border-radius: 8px; color: #b6c2dd; font-size: 12.5px; text-decoration: none;
+  }
+  .nav-item svg { width: 16px; height: 16px; opacity: .8; }
+  .nav-item:hover { background: rgba(255, 255, 255, .05); color: #fff; }
+  .nav-item.active { background: rgba(129, 140, 248, .16); color: #fff; box-shadow: inset 0 0 0 1px rgba(129, 140, 248, .18); }
+  .nav-item.active svg { opacity: 1; color: #8b93ff; }
+  .sidebar-foot { margin-top: auto; padding: 12px; border-radius: 11px; background: rgba(255, 255, 255, .045); border: 1px solid rgba(255,255,255,.06); }
+  .sidebar-foot strong { color: #dfe7fb; font-size: 11.5px; font-weight: 600; }
+  .sidebar-foot p { color: #7381a1; font-size: 10.5px; line-height: 1.55; margin: 5px 0 0; }
+
+  .main { flex: 1; min-width: 0; padding: 24px 30px 40px; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 23px; }
+  .crumbs { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 11.5px; }
+  .crumbs b { color: var(--ink); font-weight: 600; }
+  .top-actions { display: flex; align-items: center; gap: 10px; }
+  .search {
+    width: 210px; height: 34px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel);
+    display: flex; align-items: center; gap: 7px; padding: 0 10px; color: var(--muted); font-size: 11.5px;
+  }
+  .search svg { width: 14px; height: 14px; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #ffd6a5, #f4a261); display: grid; place-items: center; font-weight: 700; color: #6b3410; font-size: 11px; }
+  .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin-bottom: 19px; }
+  .page-head h1 { margin: 0; font-size: 25px; letter-spacing: -.6px; line-height: 1.2; }
+  .page-head .sub { margin: 7px 0 0; color: var(--muted); font-size: 12px; display: flex; align-items: center; gap: 8px; }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 3px var(--teal-soft); }
+  .head-buttons { display: flex; gap: 8px; }
+  .btn { height: 34px; padding: 0 13px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink-2); font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  .btn svg { width: 14px; height: 14px; }
+  .btn.primary { border-color: var(--indigo); background: var(--indigo); color: #fff; box-shadow: 0 7px 18px rgba(81, 72, 230, .18); }
+  .btn.primary:hover { background: #4339d8; }
+
+  .alert {
+    display: flex; align-items: flex-start; gap: 10px; padding: 11px 13px; margin-bottom: 16px;
+    background: var(--orange-soft); border: 1px solid #f7dcc2; border-radius: 9px; color: #8a4a12; font-size: 12px;
+  }
+  .alert-icon { width: 18px; height: 18px; flex: 0 0 auto; border-radius: 50%; background: #f4a261; color: #fff; display: grid; place-items: center; font-size: 11px; font-weight: 800; margin-top: 1px; }
+  .alert strong { color: #6f370b; }
+  .alert a { margin-left: auto; color: #9a5417; font-size: 11px; text-decoration: none; white-space: nowrap; border-bottom: 1px solid rgba(154, 84, 23, .35); }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 14px; }
+  .kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 15px 13px; box-shadow: var(--shadow); }
+  .kpi-top { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 11px; }
+  .kpi-icon { width: 25px; height: 25px; border-radius: 7px; display: grid; place-items: center; background: var(--indigo-soft); color: var(--indigo); }
+  .kpi:nth-child(2) .kpi-icon { background: var(--teal-soft); color: var(--teal); }
+  .kpi:nth-child(3) .kpi-icon { background: var(--orange-soft); color: #d57a26; }
+  .kpi:nth-child(4) .kpi-icon { background: #f1efff; color: #7a5af8; }
+  .kpi-icon svg { width: 14px; height: 14px; }
+  .kpi-value { margin-top: 9px; font-size: 24px; line-height: 1.1; font-weight: 700; letter-spacing: -.6px; }
+  .kpi-foot { display: flex; align-items: center; gap: 6px; margin-top: 7px; font-size: 10.5px; color: var(--muted); }
+  .delta { font-weight: 650; padding: 1px 5px; border-radius: 4px; font-size: 10px; }
+  .delta.up { color: #087a69; background: var(--teal-soft); }
+  .delta.down { color: #b44141; background: var(--red-soft); }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(260px, 1fr); gap: 14px; margin-bottom: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+  .card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 15px 16px 0; }
+  .card-title { font-size: 13px; font-weight: 650; letter-spacing: -.1px; }
+  .card-sub { color: var(--muted); font-size: 10.5px; margin-top: 3px; }
+  .legend { display: flex; gap: 12px; color: var(--muted); font-size: 10px; padding-top: 2px; }
+  .legend span { display: flex; align-items: center; gap: 4px; }
+  .legend i { width: 6px; height: 6px; border-radius: 2px; display: block; }
+  .chart-wrap { padding: 12px 14px 10px; }
+  .chart-wrap svg { display: block; width: 100%; height: 196px; }
+  .chart-labels { display: flex; justify-content: space-between; color: var(--muted); font-size: 9.5px; padding: 4px 4px 0; }
+
+  .goal-list { padding: 5px 16px 13px; }
+  .goal { padding: 11px 0; border-bottom: 1px solid var(--line); }
+  .goal:last-child { border-bottom: 0; }
+  .goal-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 11.5px; }
+  .goal-top strong { font-weight: 600; }
+  .goal-top span { color: var(--muted); font-size: 10px; }
+  .bar { height: 6px; border-radius: 99px; background: #f0f2f8; margin-top: 8px; overflow: hidden; }
+  .bar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #7c7af5, #5148e6); }
+  .goal:nth-child(2) .bar i { background: linear-gradient(90deg, #5ee0ce, #0f9d8a); }
+  .goal:nth-child(3) .bar i { background: linear-gradient(90deg, #f8c48a, #f2994a); }
+  .goal-note { display: flex; justify-content: space-between; margin-top: 5px; color: var(--muted); font-size: 9.5px; }
+
+  .table-card { overflow: hidden; }
+  .table-tools { display: flex; gap: 7px; }
+  .chip { font-size: 10px; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 3px 7px; background: #fbfcff; }
+  table { width: 100%; border-collapse: collapse; margin-top: 11px; font-size: 11.5px; }
+  th { text-align: left; color: var(--muted); font-weight: 500; font-size: 10px; padding: 9px 16px; background: #fafbff; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  td { padding: 11px 16px; border-bottom: 1px solid #f0f2f8; color: var(--ink-2); }
+  tr:last-child td { border-bottom: 0; }
+  .channel { display: flex; align-items: center; gap: 8px; color: var(--ink); font-weight: 500; }
+  .channel i { width: 8px; height: 8px; border-radius: 3px; display: block; }
+  .tag { display: inline-block; font-size: 9.5px; border-radius: 4px; padding: 2px 6px; }
+  .tag.good { color: #087a69; background: var(--teal-soft); }
+  .tag.watch { color: #9a5a13; background: var(--orange-soft); }
+  .tag.bad { color: #b44141; background: var(--red-soft); }
+  .num { font-variant-numeric: tabular-nums; }
+  .tiny-spark { display: inline-flex; align-items: flex-end; gap: 2px; height: 18px; }
+  .tiny-spark i { width: 3px; border-radius: 2px 2px 0 0; background: #ddddff; display: block; }
+  .tiny-spark i.on { background: #7b73f2; }
+
+  .footnote { color: var(--muted); font-size: 9.5px; margin-top: 10px; display: flex; justify-content: space-between; }
+  @media (max-width: 1100px) {
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .grid { grid-template-columns: 1fr; }
+    .sidebar { width: 190px; flex-basis: 190px; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">L</div>
+      <div><div class="brand-name">Lumen Analytics</div><div class="brand-sub">Growth workspace</div></div>
+    </div>
+    <nav class="nav-group">
+      <div class="nav-label">工作台</div>
+      <a class="nav-item active" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg>增长概览</a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 19V9m5 10V4m5 15v-7m5 7V7"/></svg>渠道分析</a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5v4h4M10 12h5M10 15.5h5"/></svg>报告中心</a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 00-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 00-2-1.2L14.1 3h-4.2l-.4 2.6a7 7 0 00-2 1.2l-2.4-1-2 3.4 2 1.6a7 7 0 000 2.4l-2 1.6 2 3.4 2.4-1c.6.5 1.3.9 2 1.2l.4 2.6h4.2l.4-2.6c.7-.3 1.4-.7 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z"/></svg>设置</a>
+    </nav>
+    <nav class="nav-group">
+      <div class="nav-label">最近报告</div>
+      <a class="nav-item" href="#">Q3 增长复盘</a>
+      <a class="nav-item" href="#">渠道预算建议</a>
+      <a class="nav-item" href="#">留存分群实验</a>
+    </nav>
+    <div class="sidebar-foot">
+      <strong>本周数据质量</strong>
+      <p>3 个数据源正常同步<br>最后校准：今天 09:42</p>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="crumbs">工作台 <span>/</span> <b>增长概览</b></div>
+      <div class="top-actions">
+        <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></svg>搜索指标、报告…</div>
+        <div class="avatar">LZ</div>
+      </div>
+    </div>
+
+    <div class="page-head">
+      <div>
+        <h1>增长概览</h1>
+        <p class="sub"><span class="live-dot"></span>数据更新于 09:42 · 统计周期 最近 28 天</p>
+      </div>
+      <div class="head-buttons">
+        <button class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3v11m0 0l4-4m-4 4l-4-4M4.5 17.5v2A1.5 1.5 0 006 21h12a1.5 1.5 0 001.5-1.5v-2"/></svg>导出报告</button>
+        <button class="btn primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>新建看板</button>
+      </div>
+    </div>
+
+    <div class="alert">
+      <span class="alert-icon">!</span>
+      <div><strong>付费广告的 CPA 已超出目标 18%。</strong> 过去 7 天获客成本持续上升，建议检查「品牌词」与「再营销」两组广告的预算分配。</div>
+      <a href="#">查看诊断 →</a>
+    </div>
+
+    <section class="kpis">
+      <article class="kpi">
+        <div class="kpi-top"><span>访问量</span><span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z"/><circle cx="12" cy="12" r="2.6"/></svg></span></div>
+        <div class="kpi-value">128,430</div>
+        <div class="kpi-foot"><span class="delta up">+12.4%</span>较上周期</div>
+      </article>
+      <article class="kpi">
+        <div class="kpi-top"><span>转化率</span><span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 18L10 12l4 3 6-8"/><path d="M15 7h5v5"/></svg></span></div>
+        <div class="kpi-value">4.86%</div>
+        <div class="kpi-foot"><span class="delta up">+0.7pp</span>较上周期</div>
+      </article>
+      <article class="kpi">
+        <div class="kpi-top"><span>客单价</span><span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16v11H4z"/><path d="M4 10h16M8 15h3"/></svg></span></div>
+        <div class="kpi-value">¥312</div>
+        <div class="kpi-foot"><span class="delta down">-2.1%</span>较上周期</div>
+      </article>
+      <article class="kpi">
+        <div class="kpi-top"><span>活跃用户</span><span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3.5 20c0-3.3 2.5-5.5 5.5-5.5s5.5 2.2 5.5 5.5M16 5.2a3 3 0 010 5.6M17.5 14.8c2 .6 3 2.2 3 5.2"/></svg></span></div>
+        <div class="kpi-value">24,918</div>
+        <div class="kpi-foot"><span class="delta up">+8.2%</span>较上周期</div>
+      </article>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <div class="card-head">
+          <div><div class="card-title">访问与转化趋势</div><div class="card-sub">日均访问量与注册转化率</div></div>
+          <div class="legend"><span><i style="background:#5148e6"></i>访问量</span><span><i style="background:#0f9d8a"></i>转化率</span></div>
+        </div>
+        <div class="chart-wrap">
+          <svg viewBox="0 0 720 210" preserveAspectRatio="none" aria-label="访问与转化趋势折线图">
+            <defs>
+              <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#5148e6" stop-opacity=".22"/>
+                <stop offset="100%" stop-color="#5148e6" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <g stroke="#edf0f7" stroke-width="1">
+              <line x1="0" y1="34" x2="720" y2="34"/><line x1="0" y1="86" x2="720" y2="86"/><line x1="0" y1="138" x2="720" y2="138"/><line x1="0" y1="190" x2="720" y2="190"/>
+            </g>
+            <path d="M0,156 C40,148 55,128 92,132 C128,136 150,110 194,118 C238,126 252,96 294,100 C336,104 352,74 398,84 C444,94 466,58 510,66 C554,74 570,42 616,48 C662,54 686,26 720,30 L720,202 L0,202 Z" fill="url(#area)"/>
+            <path d="M0,156 C40,148 55,128 92,132 C128,136 150,110 194,118 C238,126 252,96 294,100 C336,104 352,74 398,84 C444,94 466,58 510,66 C554,74 570,42 616,48 C662,54 686,26 720,30" fill="none" stroke="#5148e6" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M0,178 C50,174 70,170 110,172 C150,174 178,160 220,164 C262,168 292,152 334,154 C376,156 400,142 446,146 C492,150 516,136 558,140 C600,144 644,126 686,130 L720,124" fill="none" stroke="#0f9d8a" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 4"/>
+            <circle cx="616" cy="48" r="3.6" fill="#fff" stroke="#5148e6" stroke-width="2.2"/>
+            <circle cx="686" cy="130" r="3.2" fill="#fff" stroke="#0f9d8a" stroke-width="2"/>
+          </svg>
+          <div class="chart-labels"><span>09-30</span><span>10-04</span><span>10-08</span><span>10-12</span><span>10-16</span><span>10-20</span><span>10-24</span><span>10-28</span></div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head"><div><div class="card-title">本周目标</div><div class="card-sub">第 44 周 · 剩余 4 天</div></div><span class="chip">自动计算</span></div>
+        <div class="goal-list">
+          <div class="goal">
+            <div class="goal-top"><strong>新增注册</strong><span>8,420 / 12,000</span></div>
+            <div class="bar"><i style="width:70%"></i></div>
+            <div class="goal-note"><span>完成 70%</span><span>按当前速度预计 11,960</span></div>
+          </div>
+          <div class="goal">
+            <div class="goal-top"><strong>付费转化</strong><span>486 / 600</span></div>
+            <div class="bar"><i style="width:81%"></i></div>
+            <div class="goal-note"><span>完成 81%</span><span>略高于计划</span></div>
+          </div>
+          <div class="goal">
+            <div class="goal-top"><strong>内容发布</strong><span>3 / 5</span></div>
+            <div class="bar"><i style="width:60%"></i></div>
+            <div class="goal-note"><span>完成 60%</span><span>还差 2 篇</span></div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="card table-card">
+      <div class="card-head">
+        <div><div class="card-title">渠道表现</div><div class="card-sub">最近 28 天 · 按获客成本排序</div></div>
+        <div class="table-tools"><span class="chip">全部渠道</span><span class="chip">按 CPA</span></div>
+      </div>
+      <table>
+        <thead><tr><th>渠道</th><th>访问量</th><th>注册</th><th>转化率</th><th>CPA</th><th>趋势</th><th>状态</th></tr></thead>
+        <tbody>
+          <tr><td><span class="channel"><i style="background:#7b73f2"></i>自然搜索</span></td><td class="num">58,210</td><td class="num">3,904</td><td class="num">6.71%</td><td class="num">¥46</td><td><span class="tiny-spark"><i style="height:5px"></i><i style="height:7px"></i><i style="height:6px"></i><i style="height:9px" class="on"></i><i style="height:8px" class="on"></i><i style="height:11px" class="on"></i><i style="height:12px" class="on"></i></span></td><td><span class="tag good">健康</span></td></tr>
+          <tr><td><span class="channel"><i style="background:#5ee0ce"></i>社交媒体</span></td><td class="num">31,870</td><td class="num">1,672</td><td class="num">5.25%</td><td class="num">¥83</td><td><span class="tiny-spark"><i style="height:6px"></i><i style="height:5px"></i><i style="height:8px"></i><i style="height:7px"></i><i style="height:10px" class="on"></i><i style="height:9px" class="on"></i><i style="height:11px" class="on"></i></span></td><td><span class="tag good">健康</span></td></tr>
+          <tr><td><span class="channel"><i style="background:#f8c48a"></i>邮件营销</span></td><td class="num">17,640</td><td class="num">1,056</td><td class="num">5.99%</td><td class="num">¥61</td><td><span class="tiny-spark"><i style="height:8px"></i><i style="height:7px"></i><i style="height:9px" class="on"></i><i style="height:8px" class="on"></i><i style="height:10px" class="on"></i><i style="height:9px" class="on"></i><i style="height:11px" class="on"></i></span></td><td><span class="tag good">健康</span></td></tr>
+          <tr><td><span class="channel"><i style="background:#f2994a"></i>付费广告</span></td><td class="num">20,710</td><td class="num">1,002</td><td class="num">4.84%</td><td class="num">¥189</td><td><span class="tiny-spark"><i style="height:6px"></i><i style="height:5px"></i><i style="height:5px"></i><i style="height:4px"></i><i style="height:3px"></i><i style="height:4px"></i><i style="height:2px"></i></span></td><td><span class="tag bad">超目标</span></td></tr>
+          <tr><td><span class="channel"><i style="background:#a7b4d8"></i>直接访问</span></td><td class="num">9,310</td><td class="num">432</td><td class="num">4.64%</td><td class="num">¥38</td><td><span class="tiny-spark"><i style="height:7px"></i><i style="height:8px"></i><i style="height:7px" class="on"></i><i style="height:9px" class="on"></i><i style="height:8px" class="on"></i><i style="height:10px" class="on"></i><i style="height:9px" class="on"></i></span></td><td><span class="tag good">健康</span></td></tr>
+        </tbody>
+      </table>
+      <div class="footnote"><span>注：CPA = 获客成本；「超目标」阈值由本周预算计划自动判定。</span><span>数据源：Lumen Warehouse · 同步正常</span></div>
+    </section>
+  </main>
+</div>
+</body>
+</html>
